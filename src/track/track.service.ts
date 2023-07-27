@@ -12,7 +12,7 @@ export class TrackService {
     return 'One track';
   }
 
-  create(createTrackDto: CreateTrackDto) {
+  create(createTrack: CreateTrackDto) {
     return 'Create Track';
   }
 
