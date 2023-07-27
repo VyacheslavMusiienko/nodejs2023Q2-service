@@ -16,7 +16,7 @@ export class UserService {
     return 'Create user';
   }
 
-  update(id: number, updatePasswordDto: UpdatePasswordDto) {
+  update(id: number, updatePassword: UpdatePasswordDto) {
     return 'Update password';
   }
 

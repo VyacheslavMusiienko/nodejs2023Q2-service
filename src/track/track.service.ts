@@ -16,7 +16,7 @@ export class TrackService {
     return 'Create Track';
   }
 
-  update(id: number, updateTrackDto: UpdateTrackDto) {
+  update(id: number, updateTrack: UpdateTrackDto) {
     return 'Update information about track';
   }
 
