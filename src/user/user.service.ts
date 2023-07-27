@@ -5,7 +5,7 @@ import { UpdatePasswordDto } from './dto/update.dto';
 @Injectable()
 export class UserService {
   findAll() {
-    return 'All User';
+    return 'All Users';
   }
 
   findOne(id: number) {
@@ -21,6 +21,6 @@ export class UserService {
   }
 
   delete(id: number) {
-    'Delete user';
+    return 'Delete user';
   }
 }
