@@ -5,9 +5,14 @@ import {
   Get,
   Param,
   ParseIntPipe,
-  Patch,
   Post,
+  Put,
 } from '@nestjs/common';
+import { UuidDto } from '../common/uuid.dto';
+import { AuthError } from '../errors/auth';
+import { HttpNotFound } from '../errors/http/httpNotFound';
+import { HttpServerError } from '../errors/http/httpServer';
+import { NotFoundError } from '../errors/notFound';
 import { CreateUserDto } from './dto/create.dto';
 import { UpdatePasswordDto } from './dto/update.dto';
 import { UserService } from './user.service';
@@ -22,8 +27,16 @@ export class UserController {
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.userService.findOne(id);
+  findOne(@Param('id', ParseIntPipe) { id }: UuidDto) {
+    try {
+      return this.userService.findOne(id);
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw new NotFoundError();
+      }
+
+      throw new HttpNotFound();
+    }
   }
 
   @Post()
@@ -31,16 +44,34 @@ export class UserController {
     return this.userService.create(createUser);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseIntPipe) { id }: UuidDto,
     @Body() updatePassword: UpdatePasswordDto,
   ) {
-    return this.userService.update(id, updatePassword);
+    try {
+      return this.userService.update(id, updatePassword);
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw new HttpNotFound();
+      } else if (error instanceof AuthError) {
+        throw new AuthError();
+      }
+
+      throw new HttpServerError();
+    }
   }
 
   @Delete(':id')
-  delete(@Param('id', ParseIntPipe) id: number) {
-    return this.userService.delete(id);
+  remove(@Param('id', ParseIntPipe) { id }: UuidDto) {
+    try {
+      return this.userService.remove(id);
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw new HttpNotFound();
+      }
+
+      throw new HttpServerError();
+    }
   }
 }
