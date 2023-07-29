@@ -10,12 +10,12 @@ import { Track } from './entity/track.entity';
 export class TrackService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  findAll() {
-    return this.databaseService.tracks.find();
+  async findAll() {
+    return await this.databaseService.tracks.find();
   }
 
-  findOne(id: number) {
-    const findTrack = this.databaseService.tracks.findByOne({ id });
+  async findOne(id: number) {
+    const findTrack = await this.databaseService.tracks.findUnique({ id });
 
     if (findTrack === null) {
       throw new NotFoundError();
@@ -24,12 +24,12 @@ export class TrackService {
     return findTrack;
   }
 
-  create({ name, duration, artistId, albumId }: CreateTrackDto) {
-    const trackArtistId = this.databaseService.artists.has(artistId)
+  async create({ name, duration, artistId, albumId }: CreateTrackDto) {
+    const trackArtistId = (await this.databaseService.artists.has(artistId))
       ? artistId
       : null;
 
-    const trackAlbumId = this.databaseService.albums.has(albumId)
+    const trackAlbumId = (await this.databaseService.albums.has(albumId))
       ? albumId
       : null;
 
@@ -41,11 +41,11 @@ export class TrackService {
       duration,
     });
 
-    return this.databaseService.tracks.create(track);
+    return await this.databaseService.tracks.create(track);
   }
 
-  update(id: number, updateTrack: UpdateTrackDto) {
-    const findTrack = this.databaseService.tracks.findOneBy({ id });
+  async update(id: number, updateTrack: UpdateTrackDto) {
+    const findTrack = await this.databaseService.tracks.findOneBy({ id });
 
     if (findTrack === null) {
       throw new NotFoundError();
@@ -56,17 +56,18 @@ export class TrackService {
       ...updateTrack,
     });
 
-    return this.databaseService.tracks.update(id, updatedTrack);
+    return await this.databaseService.tracks.update(id, updatedTrack);
   }
 
-  remove(id: number) {
-    if (!this.databaseService.tracks.has(id)) {
+  async remove(id: number) {
+    const isTrack = await this.databaseService.tracks.has(id);
+    if (!isTrack) {
       throw new NotFoundError();
     }
 
     // Remove from favorite
-    this.databaseService.favorites.tracks.delete(id);
+    await this.databaseService.favorites.tracks.delete(id);
 
-    return this.databaseService.tracks.remove({ id });
+    return await this.databaseService.tracks.remove({ id });
   }
 }
