@@ -46,7 +46,7 @@ export class FavoriteService {
   }
 
   async createAlbum(id: string) {
-    const findAlbum = await this.databaseService.albums.findOneBy({ id });
+    const findAlbum = await this.databaseService.albums.findUnique({ id });
 
     if (findAlbum === null) {
       throw new UnprocessableError();
@@ -74,7 +74,7 @@ export class FavoriteService {
   }
 
   async createArtist(id: string) {
-    const findArtist = await this.databaseService.artists.findOneBy({ id });
+    const findArtist = await this.databaseService.artists.findUnique({ id });
 
     if (findArtist === null) {
       throw new UnprocessableError();
