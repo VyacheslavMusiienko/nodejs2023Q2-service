@@ -13,19 +13,19 @@ export class DatabaseService {
     return this.database.users;
   }
 
-  // get artists() {
-  //   return this.database.artists;
-  // }
+  get artists() {
+    return this.database.artists;
+  }
 
-  // get tracks() {
-  //   return this.database.tracks;
-  // }
+  get tracks() {
+    return this.database.tracks;
+  }
 
-  // get albums() {
-  //   return this.database.albums;
-  // }
+  get albums() {
+    return this.database.albums;
+  }
 
-  // get favorites() {
-  //   return this.database.favorites;
-  // }
+  get favorites() {
+    return this.database.favorites;
+  }
 }
