@@ -3,12 +3,12 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Param,
   ParseIntPipe,
   Post,
   Put,
 } from '@nestjs/common';
-import { UuidDto } from '../common/uuid.dto';
 import { AuthError } from '../errors/auth';
 import { HttpNotFound } from '../errors/http/httpNotFound';
 import { HttpServerError } from '../errors/http/httpServer';
@@ -16,6 +16,7 @@ import { NotFoundError } from '../errors/notFound';
 import { CreateUserDto } from './dto/create.dto';
 import { UpdatePasswordDto } from './dto/update.dto';
 import { UserService } from './user.service';
+import { StatusCodes } from 'http-status-codes';
 
 @Controller('user')
 export class UserController {
@@ -27,7 +28,7 @@ export class UserController {
   }
 
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) { id }: UuidDto) {
+  async findOne(@Param('id', ParseIntPipe) id: string) {
     try {
       return await this.userService.findOne(id);
     } catch (error) {
@@ -46,7 +47,7 @@ export class UserController {
 
   @Put(':id')
   async update(
-    @Param('id', ParseIntPipe) { id }: UuidDto,
+    @Param('id', ParseIntPipe) id: string,
     @Body() updatePassword: UpdatePasswordDto,
   ) {
     try {
@@ -63,7 +64,8 @@ export class UserController {
   }
 
   @Delete(':id')
-  async remove(@Param('id', ParseIntPipe) { id }: UuidDto) {
+  @HttpCode(StatusCodes.NO_CONTENT)
+  async remove(@Param('id', ParseIntPipe) id: string) {
     try {
       return await this.userService.remove(id);
     } catch (error) {

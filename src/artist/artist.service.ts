@@ -6,6 +6,7 @@ import { CreateArtistDto } from './dto/create.dto';
 import { UpdateArtistDto } from './dto/updata.dto';
 import { Artist } from './entity/artist.entity';
 import { Track } from '../track/entity/track.entity';
+import { Album } from '../album/entity/album.entity';
 
 @Injectable()
 export class ArtistService {
@@ -69,7 +70,7 @@ export class ArtistService {
     });
 
     // Remove from albums
-    const albums = await this.databaseService.albums.find();
+    const albums: Album[] = await this.databaseService.albums.find();
 
     albums.forEach(async (album) => {
       if (album.artistId === id) {

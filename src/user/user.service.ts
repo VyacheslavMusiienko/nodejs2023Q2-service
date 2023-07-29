@@ -16,7 +16,7 @@ export class UserService {
     return await this.databaseService.users.find();
   }
 
-  async findOne(id: number): Promise<User> {
+  async findOne(id: string): Promise<User> {
     const findUser = await this.databaseService.users.findUnique({ id });
 
     if (findUser === null) {
@@ -38,8 +38,8 @@ export class UserService {
     return await this.databaseService.users.create(user);
   }
 
-  async update(id: number, { oldPassword, newPassword }: UpdatePasswordDto) {
-    const findUser = await this.databaseService.users.findOneBy({ id });
+  async update(id: string, { oldPassword, newPassword }: UpdatePasswordDto) {
+    const findUser = await this.databaseService.users.findUnique({ id });
 
     if (findUser === null) {
       throw new NotFoundError();
@@ -61,7 +61,7 @@ export class UserService {
     return await this.databaseService.users.update(id, updatedUser);
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     const isUser = await this.databaseService.users.has(id);
     if (!isUser) {
       throw new NotFoundError();

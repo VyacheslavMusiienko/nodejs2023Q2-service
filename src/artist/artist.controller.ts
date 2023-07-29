@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Param,
   ParseIntPipe,
   Post,
@@ -11,6 +12,7 @@ import {
 import { ArtistService } from './artist.service';
 import { CreateArtistDto } from './dto/create.dto';
 import { UpdateArtistDto } from './dto/updata.dto';
+import { StatusCodes } from 'http-status-codes';
 
 @Controller('artist')
 export class ArtistController {
@@ -40,6 +42,7 @@ export class ArtistController {
   }
 
   @Delete(':id')
+  @HttpCode(StatusCodes.NO_CONTENT)
   async delete(@Param('id', ParseIntPipe) id: string) {
     return await this.artistService.remove(id);
   }

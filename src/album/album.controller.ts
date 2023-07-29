@@ -3,44 +3,74 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Param,
   ParseIntPipe,
-  Patch,
   Post,
+  Put,
 } from '@nestjs/common';
+import { NotFoundError } from 'rxjs';
+import { HttpNotFound } from '../errors/http/httpNotFound';
+import { HttpServerError } from '../errors/http/httpServer';
 import { AlbumService } from './album.service';
 import { CreateAlbumDto } from './dto/create.dto';
 import { UpdateAlbumDto } from './dto/update.dto';
+import { StatusCodes } from 'http-status-codes';
 
 @Controller('album')
 export class AlbumController {
   constructor(private readonly albumService: AlbumService) {}
 
   @Get()
-  findAll() {
-    return this.albumService.findAll();
+  async findAll() {
+    return await this.albumService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.albumService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: string) {
+    try {
+      return await this.albumService.findOne(id);
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw new HttpNotFound();
+      }
+
+      throw new HttpServerError();
+    }
   }
 
   @Post()
-  create(@Body() createAlbum: CreateAlbumDto) {
-    return this.albumService.create(createAlbum);
+  async create(@Body() createAlbum: CreateAlbumDto) {
+    return await this.albumService.create(createAlbum);
   }
 
-  @Patch(':id')
-  update(
-    @Param('id', ParseIntPipe) id: number,
+  @Put(':id')
+  async update(
+    @Param('id', ParseIntPipe) id: string,
     @Body() UpdateAlbum: UpdateAlbumDto,
   ) {
-    return this.albumService.update(id, UpdateAlbum);
+    try {
+      return await this.albumService.update(id, UpdateAlbum);
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw new HttpNotFound();
+      }
+
+      throw new HttpServerError();
+    }
   }
 
   @Delete(':id')
-  delete(@Param('id', ParseIntPipe) id: number) {
-    return this.albumService.delete(id);
+  @HttpCode(StatusCodes.NO_CONTENT)
+  async delete(@Param('id', ParseIntPipe) id: string) {
+    try {
+      return await this.albumService.remove(id);
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw new HttpNotFound();
+      }
+
+      throw new HttpServerError();
+    }
   }
 }

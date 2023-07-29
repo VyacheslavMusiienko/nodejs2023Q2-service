@@ -14,7 +14,7 @@ export class TrackService {
     return await this.databaseService.tracks.find();
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     const findTrack = await this.databaseService.tracks.findUnique({ id });
 
     if (findTrack === null) {
@@ -44,8 +44,8 @@ export class TrackService {
     return await this.databaseService.tracks.create(track);
   }
 
-  async update(id: number, updateTrack: UpdateTrackDto) {
-    const findTrack = await this.databaseService.tracks.findOneBy({ id });
+  async update(id: string, updateTrack: UpdateTrackDto) {
+    const findTrack = await this.databaseService.tracks.findUnique({ id });
 
     if (findTrack === null) {
       throw new NotFoundError();
@@ -59,7 +59,7 @@ export class TrackService {
     return await this.databaseService.tracks.update(id, updatedTrack);
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     const isTrack = await this.databaseService.tracks.has(id);
     if (!isTrack) {
       throw new NotFoundError();
