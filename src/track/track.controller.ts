@@ -9,9 +9,13 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  UseFilters,
+  UseInterceptors,
 } from '@nestjs/common';
 import { StatusCodes } from 'http-status-codes';
 import { NotFoundError } from '../errors/notFound';
+import { HttpExceptionFilter } from '../utils/httpFilter';
+import { TransformInterceptor } from '../utils/httpTransform';
 import { HttpNotFound } from './../errors/http/httpNotFound';
 import { HttpServerError } from './../errors/http/httpServer';
 import { CreateTrackDto } from './dto/create.dto';
@@ -19,6 +23,8 @@ import { UpdateTrackDto } from './dto/update.dto';
 import { TrackService } from './track.service';
 
 @Controller('track')
+@UseFilters(new HttpExceptionFilter())
+@UseInterceptors(new TransformInterceptor())
 export class TrackController {
   constructor(private readonly trackService: TrackService) {}
 

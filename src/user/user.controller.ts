@@ -6,21 +6,26 @@ import {
   Header,
   HttpCode,
   Param,
-  ParseIntPipe,
   ParseUUIDPipe,
   Post,
   Put,
+  UseFilters,
+  UseInterceptors,
 } from '@nestjs/common';
 import { StatusCodes } from 'http-status-codes';
 import { AuthError } from '../errors/auth';
 import { HttpNotFound } from '../errors/http/httpNotFound';
 import { HttpServerError } from '../errors/http/httpServer';
 import { NotFoundError } from '../errors/notFound';
+import { HttpExceptionFilter } from '../utils/httpFilter';
+import { TransformInterceptor } from '../utils/httpTransform';
 import { CreateUserDto } from './dto/create.dto';
 import { UpdatePasswordDto } from './dto/update.dto';
 import { UserService } from './user.service';
 
 @Controller('user')
+@UseFilters(new HttpExceptionFilter())
+@UseInterceptors(new TransformInterceptor())
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -69,8 +74,8 @@ export class UserController {
     }
   }
 
-  @Header('Content-Type', 'application/json')
   @Delete(':id')
+  @Header('Content-Type', 'application/json')
   @HttpCode(StatusCodes.NO_CONTENT)
   async remove(@Param('id', ParseUUIDPipe) id: string) {
     try {

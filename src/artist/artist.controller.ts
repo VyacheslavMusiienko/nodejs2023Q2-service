@@ -6,17 +6,22 @@ import {
   Header,
   HttpCode,
   Param,
-  ParseIntPipe,
   ParseUUIDPipe,
   Post,
   Put,
+  UseFilters,
+  UseInterceptors,
 } from '@nestjs/common';
 import { StatusCodes } from 'http-status-codes';
+import { HttpExceptionFilter } from '../utils/httpFilter';
+import { TransformInterceptor } from '../utils/httpTransform';
 import { ArtistService } from './artist.service';
 import { CreateArtistDto } from './dto/create.dto';
 import { UpdateArtistDto } from './dto/updata.dto';
 
 @Controller('artist')
+@UseFilters(new HttpExceptionFilter())
+@UseInterceptors(new TransformInterceptor())
 export class ArtistController {
   constructor(private readonly artistService: ArtistService) {}
 

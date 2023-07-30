@@ -71,11 +71,10 @@ export class UserService {
   }
 
   async remove(id: string) {
-    const isUser = await this.databaseService.users.has(id);
-    if (!isUser) {
+    if (!this.databaseService.users.has(id)) {
       throw new NotFoundError();
     }
 
-    return await this.databaseService.users.remove({ id });
+    return this.databaseService.users.remove({ id });
   }
 }

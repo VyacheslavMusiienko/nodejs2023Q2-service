@@ -5,11 +5,14 @@ import { readFile } from 'fs/promises';
 import { join } from 'path';
 import { AppModule } from './app.module';
 import * as yaml from 'js-yaml';
+import { ValidationPipe } from '@nestjs/common';
 
 const PORT = Number(process.env.PORT || 4000);
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.useGlobalPipes(new ValidationPipe());
 
   const yamlData = await readFile(
     join(process.cwd(), './doc/api.yaml'),

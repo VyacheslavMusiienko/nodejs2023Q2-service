@@ -7,6 +7,8 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
+  UseFilters,
+  UseInterceptors,
 } from '@nestjs/common';
 import { StatusCodes } from 'http-status-codes';
 import { HttpNotFound } from '../errors/http/httpNotFound';
@@ -14,9 +16,13 @@ import { HttpServerError } from '../errors/http/httpServer';
 import { HttpUnprocessable } from '../errors/http/httpUnprocessable';
 import { NotFoundError } from '../errors/notFound';
 import { UnprocessableError } from '../errors/unprocessable';
+import { HttpExceptionFilter } from '../utils/httpFilter';
+import { TransformInterceptor } from '../utils/httpTransform';
 import { FavoriteService } from './favorite.service';
 
 @Controller('favorite')
+@UseFilters(new HttpExceptionFilter())
+@UseInterceptors(new TransformInterceptor())
 export class FavoriteController {
   constructor(private readonly favoriteService: FavoriteService) {}
 

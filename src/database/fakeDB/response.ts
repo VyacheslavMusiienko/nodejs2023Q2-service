@@ -14,13 +14,13 @@ export class BaseRepository<T> {
   }
 
   remove({ id }: FindOptions) {
-    const foundIndex = this.items.findIndex((item) => item.id === id);
+    const findIndex = this.items.findIndex((item) => item.id === id);
 
-    if (foundIndex === -1) {
+    if (findIndex === -1) {
       return false;
     }
 
-    this.items.splice(foundIndex, 1);
+    this.items.splice(findIndex, 1);
 
     return true;
   }
