@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { SwaggerModule } from '@nestjs/swagger';
+import { OpenAPIObject, SwaggerModule } from '@nestjs/swagger';
 import 'dotenv/config';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
@@ -15,7 +15,7 @@ async function bootstrap() {
     join(process.cwd(), './doc/api.yaml'),
     'utf-8',
   );
-  const document = yaml.load(yamlData);
+  const document = yaml.load(yamlData) as OpenAPIObject | (() => OpenAPIObject);
   SwaggerModule.setup('doc', app, document);
 
   await app.listen(PORT);
