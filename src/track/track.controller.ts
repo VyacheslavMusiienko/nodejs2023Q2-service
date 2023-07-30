@@ -6,17 +6,17 @@ import {
   Header,
   HttpCode,
   Param,
-  ParseIntPipe,
+  ParseUUIDPipe,
   Post,
   Put,
 } from '@nestjs/common';
+import { StatusCodes } from 'http-status-codes';
 import { NotFoundError } from '../errors/notFound';
 import { HttpNotFound } from './../errors/http/httpNotFound';
 import { HttpServerError } from './../errors/http/httpServer';
 import { CreateTrackDto } from './dto/create.dto';
 import { UpdateTrackDto } from './dto/update.dto';
 import { TrackService } from './track.service';
-import { StatusCodes } from 'http-status-codes';
 
 @Controller('track')
 export class TrackController {
@@ -29,7 +29,7 @@ export class TrackController {
   }
 
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: string) {
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
     try {
       return await this.trackService.findOne(id);
     } catch (error) {
@@ -50,7 +50,7 @@ export class TrackController {
   @Put(':id')
   @Header('Content-Type', 'application/json')
   async update(
-    @Param('id', ParseIntPipe) id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updateTrack: UpdateTrackDto,
   ) {
     try {
@@ -66,7 +66,7 @@ export class TrackController {
   @Delete(':id')
   @Header('Content-Type', 'application/json')
   @HttpCode(StatusCodes.NO_CONTENT)
-  async delete(@Param('id', ParseIntPipe) id: string) {
+  async remove(@Param('id', ParseUUIDPipe) id: string) {
     try {
       return await this.trackService.remove(id);
     } catch (error) {

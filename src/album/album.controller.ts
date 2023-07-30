@@ -6,17 +6,17 @@ import {
   Header,
   HttpCode,
   Param,
-  ParseIntPipe,
+  ParseUUIDPipe,
   Post,
   Put,
 } from '@nestjs/common';
+import { StatusCodes } from 'http-status-codes';
 import { NotFoundError } from 'rxjs';
 import { HttpNotFound } from '../errors/http/httpNotFound';
 import { HttpServerError } from '../errors/http/httpServer';
 import { AlbumService } from './album.service';
 import { CreateAlbumDto } from './dto/create.dto';
 import { UpdateAlbumDto } from './dto/update.dto';
-import { StatusCodes } from 'http-status-codes';
 
 @Controller('album')
 export class AlbumController {
@@ -30,7 +30,7 @@ export class AlbumController {
 
   @Get(':id')
   @Header('Content-Type', 'application/json')
-  async findOne(@Param('id', ParseIntPipe) id: string) {
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
     try {
       return await this.albumService.findOne(id);
     } catch (error) {
@@ -51,7 +51,7 @@ export class AlbumController {
   @Put(':id')
   @Header('Content-Type', 'application/json')
   async update(
-    @Param('id', ParseIntPipe) id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() UpdateAlbum: UpdateAlbumDto,
   ) {
     try {
@@ -68,7 +68,7 @@ export class AlbumController {
   @Delete(':id')
   @Header('Content-Type', 'application/json')
   @HttpCode(StatusCodes.NO_CONTENT)
-  async delete(@Param('id', ParseIntPipe) id: string) {
+  async delete(@Param('id', ParseUUIDPipe) id: string) {
     try {
       return await this.albumService.remove(id);
     } catch (error) {

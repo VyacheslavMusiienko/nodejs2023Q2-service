@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
+import { Album } from '../album/entity/album.entity';
 import { DatabaseService } from '../database/database.service';
 import { NotFoundError } from '../errors/notFound';
+import { Track } from '../track/entity/track.entity';
 import { CreateArtistDto } from './dto/create.dto';
 import { UpdateArtistDto } from './dto/updata.dto';
 import { Artist } from './entity/artist.entity';
-import { Track } from '../track/entity/track.entity';
-import { Album } from '../album/entity/album.entity';
 
 @Injectable()
 export class ArtistService {
@@ -16,7 +16,7 @@ export class ArtistService {
     return await this.databaseService.artists.find();
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     const findTArtist = await this.databaseService.artists.findUnique({ id });
     if (findTArtist === null) {
       throw new NotFoundError();
@@ -34,7 +34,7 @@ export class ArtistService {
     return await this.databaseService.artists.create(artist);
   }
 
-  async update(id: number, updateArtist: UpdateArtistDto) {
+  async update(id: string, updateArtist: UpdateArtistDto) {
     const findArtist = await this.databaseService.artists.findUnique({ id });
 
     if (findArtist === null) {
@@ -52,10 +52,8 @@ export class ArtistService {
       throw new NotFoundError();
     }
 
-    // Remove from favorites
     await this.databaseService.favorites.artists.delete(id);
 
-    // Remove from tracks
     const tracks: Track[] = await this.databaseService.tracks.find();
 
     tracks.forEach(async (track) => {

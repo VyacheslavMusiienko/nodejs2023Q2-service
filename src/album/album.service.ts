@@ -57,10 +57,8 @@ export class AlbumService {
       throw new NotFoundError();
     }
 
-    // Remove from favorites
     await this.databaseService.favorites.albums.delete(id);
 
-    // Remove from tracks
     const tracks: Track[] = await this.databaseService.tracks.find();
 
     tracks.forEach(async (track) => {

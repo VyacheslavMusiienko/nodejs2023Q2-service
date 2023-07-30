@@ -65,7 +65,6 @@ export class TrackService {
       throw new NotFoundError();
     }
 
-    // Remove from favorite
     await this.databaseService.favorites.tracks.delete(id);
 
     return await this.databaseService.tracks.remove({ id });

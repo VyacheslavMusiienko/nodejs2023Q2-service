@@ -7,6 +7,7 @@ import {
   HttpCode,
   Param,
   ParseIntPipe,
+  ParseUUIDPipe,
   Post,
   Put,
 } from '@nestjs/common';
@@ -31,7 +32,7 @@ export class UserController {
 
   @Header('Content-Type', 'application/json')
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: string) {
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
     try {
       return await this.userService.findOne(id);
     } catch (error) {
@@ -52,7 +53,7 @@ export class UserController {
   @Header('Content-Type', 'application/json')
   @Put(':id')
   async update(
-    @Param('id', ParseIntPipe) id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updatePassword: UpdatePasswordDto,
   ) {
     try {
@@ -71,7 +72,7 @@ export class UserController {
   @Header('Content-Type', 'application/json')
   @Delete(':id')
   @HttpCode(StatusCodes.NO_CONTENT)
-  async remove(@Param('id', ParseIntPipe) id: string) {
+  async remove(@Param('id', ParseUUIDPipe) id: string) {
     try {
       return await this.userService.remove(id);
     } catch (error) {

@@ -5,6 +5,7 @@ import {
   Header,
   HttpCode,
   Param,
+  ParseUUIDPipe,
   Post,
 } from '@nestjs/common';
 import { StatusCodes } from 'http-status-codes';
@@ -27,7 +28,7 @@ export class FavoriteController {
 
   @Post('/track/:id')
   @Header('Content-Type', 'application/json')
-  async createTrack(@Param() id: string) {
+  async createTrack(@Param('id', ParseUUIDPipe) id: string) {
     try {
       return await this.favoriteService.createTrack(id);
     } catch (err) {
@@ -42,7 +43,7 @@ export class FavoriteController {
   @Delete('/track/:id')
   @Header('Content-Type', 'application/json')
   @HttpCode(StatusCodes.NO_CONTENT)
-  async removeTrack(@Param() id: string) {
+  async removeTrack(@Param('id', ParseUUIDPipe) id: string) {
     try {
       return await this.favoriteService.removeTrack(id);
     } catch (err) {
@@ -56,7 +57,7 @@ export class FavoriteController {
 
   @Post('/album/:id')
   @Header('Content-Type', 'application/json')
-  async createAlbum(@Param() id: string) {
+  async createAlbum(@Param('id', ParseUUIDPipe) id: string) {
     try {
       return await this.favoriteService.createAlbum(id);
     } catch (err) {
@@ -71,7 +72,7 @@ export class FavoriteController {
   @Delete('/album/:id')
   @Header('Content-Type', 'application/json')
   @HttpCode(StatusCodes.NO_CONTENT)
-  async removeAlbum(@Param() id: string) {
+  async removeAlbum(@Param('id', ParseUUIDPipe) id: string) {
     try {
       return await this.favoriteService.removeAlbum(id);
     } catch (err) {
@@ -85,7 +86,7 @@ export class FavoriteController {
 
   @Post('/artist/:id')
   @Header('Content-Type', 'application/json')
-  async createArtist(@Param() id: string) {
+  async createArtist(@Param('id', ParseUUIDPipe) id: string) {
     try {
       return await this.favoriteService.createArtist(id);
     } catch (err) {
@@ -100,7 +101,7 @@ export class FavoriteController {
   @Delete('/artist/:id')
   @Header('Content-Type', 'application/json')
   @HttpCode(StatusCodes.NO_CONTENT)
-  async removeArtist(@Param() id: string) {
+  async removeArtist(@Param('id', ParseUUIDPipe) id: string) {
     try {
       return await this.favoriteService.removeArtist(id);
     } catch (err) {
