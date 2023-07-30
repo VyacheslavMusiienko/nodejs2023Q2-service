@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Header,
   HttpCode,
   Param,
   ParseIntPipe,
@@ -22,11 +23,13 @@ export class AlbumController {
   constructor(private readonly albumService: AlbumService) {}
 
   @Get()
+  @Header('Content-Type', 'application/json')
   async findAll() {
     return await this.albumService.findAll();
   }
 
   @Get(':id')
+  @Header('Content-Type', 'application/json')
   async findOne(@Param('id', ParseIntPipe) id: string) {
     try {
       return await this.albumService.findOne(id);
@@ -40,11 +43,13 @@ export class AlbumController {
   }
 
   @Post()
+  @Header('Content-Type', 'application/json')
   async create(@Body() createAlbum: CreateAlbumDto) {
     return await this.albumService.create(createAlbum);
   }
 
   @Put(':id')
+  @Header('Content-Type', 'application/json')
   async update(
     @Param('id', ParseIntPipe) id: string,
     @Body() UpdateAlbum: UpdateAlbumDto,
@@ -61,6 +66,7 @@ export class AlbumController {
   }
 
   @Delete(':id')
+  @Header('Content-Type', 'application/json')
   @HttpCode(StatusCodes.NO_CONTENT)
   async delete(@Param('id', ParseIntPipe) id: string) {
     try {

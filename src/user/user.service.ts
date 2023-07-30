@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 
 import { Injectable } from '@nestjs/common';
+import { AuthenticationService } from '../database/authentication/authentication.service';
 import { DatabaseService } from '../database/database.service';
 import { AuthError } from '../errors/auth';
 import { NotFoundError } from '../errors/notFound';
@@ -10,7 +11,10 @@ import { User } from './entity/user.entity';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(
+    private readonly databaseService: DatabaseService,
+    private readonly authenticationService: AuthenticationService,
+  ) {}
 
   async findAll(): Promise<User[]> {
     return await this.databaseService.users.find();
@@ -30,7 +34,7 @@ export class UserService {
     const user = new User({
       id: uuidv4(),
       login,
-      password,
+      password: await this.authenticationService.hashPassword(password),
       version: 1,
       createdAt: Date.now(),
       updatedAt: Date.now(),
@@ -45,15 +49,20 @@ export class UserService {
       throw new NotFoundError();
     }
 
-    const { password: currentPassword } = findUser;
+    const { password: hashedPassword } = findUser;
 
-    if (currentPassword !== oldPassword) {
+    const isPasswordVerify = await this.authenticationService.verifyPassword(
+      oldPassword,
+      hashedPassword,
+    );
+
+    if (!isPasswordVerify) {
       throw new AuthError();
     }
 
     const updatedUser = new User({
       ...findUser,
-      password: newPassword,
+      password: await this.authenticationService.hashPassword(newPassword),
       updatedAt: Date.now(),
       version: findUser.version + 1,
     });

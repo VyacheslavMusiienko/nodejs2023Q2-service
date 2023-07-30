@@ -1,4 +1,12 @@
-import { Controller, Delete, Get, HttpCode, Param, Post } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  Header,
+  HttpCode,
+  Param,
+  Post,
+} from '@nestjs/common';
 import { StatusCodes } from 'http-status-codes';
 import { HttpNotFound } from '../errors/http/httpNotFound';
 import { HttpServerError } from '../errors/http/httpServer';
@@ -12,11 +20,13 @@ export class FavoriteController {
   constructor(private readonly favoriteService: FavoriteService) {}
 
   @Get()
+  @Header('Content-Type', 'application/json')
   async findAll() {
     return await this.favoriteService.findAll();
   }
 
   @Post('/track/:id')
+  @Header('Content-Type', 'application/json')
   async createTrack(@Param() id: string) {
     try {
       return await this.favoriteService.createTrack(id);
@@ -30,6 +40,7 @@ export class FavoriteController {
   }
 
   @Delete('/track/:id')
+  @Header('Content-Type', 'application/json')
   @HttpCode(StatusCodes.NO_CONTENT)
   async removeTrack(@Param() id: string) {
     try {
@@ -44,6 +55,7 @@ export class FavoriteController {
   }
 
   @Post('/album/:id')
+  @Header('Content-Type', 'application/json')
   async createAlbum(@Param() id: string) {
     try {
       return await this.favoriteService.createAlbum(id);
@@ -57,6 +69,7 @@ export class FavoriteController {
   }
 
   @Delete('/album/:id')
+  @Header('Content-Type', 'application/json')
   @HttpCode(StatusCodes.NO_CONTENT)
   async removeAlbum(@Param() id: string) {
     try {
@@ -71,6 +84,7 @@ export class FavoriteController {
   }
 
   @Post('/artist/:id')
+  @Header('Content-Type', 'application/json')
   async createArtist(@Param() id: string) {
     try {
       return await this.favoriteService.createArtist(id);
@@ -84,6 +98,7 @@ export class FavoriteController {
   }
 
   @Delete('/artist/:id')
+  @Header('Content-Type', 'application/json')
   @HttpCode(StatusCodes.NO_CONTENT)
   async removeArtist(@Param() id: string) {
     try {

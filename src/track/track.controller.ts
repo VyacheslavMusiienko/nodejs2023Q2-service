@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Header,
   HttpCode,
   Param,
   ParseIntPipe,
@@ -22,6 +23,7 @@ export class TrackController {
   constructor(private readonly trackService: TrackService) {}
 
   @Get()
+  @Header('Content-Type', 'application/json')
   async findAll() {
     return await this.trackService.findAll();
   }
@@ -40,11 +42,13 @@ export class TrackController {
   }
 
   @Post()
+  @Header('Content-Type', 'application/json')
   async create(@Body() createTrack: CreateTrackDto) {
     return await this.trackService.create(createTrack);
   }
 
   @Put(':id')
+  @Header('Content-Type', 'application/json')
   async update(
     @Param('id', ParseIntPipe) id: string,
     @Body() updateTrack: UpdateTrackDto,
@@ -60,6 +64,7 @@ export class TrackController {
   }
 
   @Delete(':id')
+  @Header('Content-Type', 'application/json')
   @HttpCode(StatusCodes.NO_CONTENT)
   async delete(@Param('id', ParseIntPipe) id: string) {
     try {
