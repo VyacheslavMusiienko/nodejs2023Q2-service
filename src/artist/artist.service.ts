@@ -41,7 +41,7 @@ export class ArtistService {
       throw new NotFoundError();
     }
 
-    const updatedArtist = new Artist({ ...findArtist, updateArtist });
+    const updatedArtist = new Artist({ ...findArtist, ...updateArtist });
 
     return await this.databaseService.artists.update(id, updatedArtist);
   }
