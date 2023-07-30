@@ -20,7 +20,7 @@ import { HttpExceptionFilter } from '../utils/httpFilter';
 import { TransformInterceptor } from '../utils/httpTransform';
 import { FavoriteService } from './favorite.service';
 
-@Controller('favorite')
+@Controller('favs')
 @UseFilters(new HttpExceptionFilter())
 @UseInterceptors(new TransformInterceptor())
 export class FavoriteController {

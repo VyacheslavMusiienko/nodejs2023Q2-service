@@ -13,7 +13,6 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { StatusCodes } from 'http-status-codes';
-import { NotFoundError } from 'rxjs';
 import { HttpNotFound } from '../errors/http/httpNotFound';
 import { HttpServerError } from '../errors/http/httpServer';
 import { HttpExceptionFilter } from '../utils/httpFilter';
@@ -21,6 +20,7 @@ import { TransformInterceptor } from '../utils/httpTransform';
 import { AlbumService } from './album.service';
 import { CreateAlbumDto } from './dto/create.dto';
 import { UpdateAlbumDto } from './dto/update.dto';
+import { NotFoundError } from '../errors/notFound';
 
 @Controller('album')
 @UseFilters(new HttpExceptionFilter())

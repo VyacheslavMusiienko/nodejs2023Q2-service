@@ -14,11 +14,12 @@ import {
 } from '@nestjs/common';
 import { StatusCodes } from 'http-status-codes';
 import { AuthError } from '../errors/auth';
-import { HttpNotFound } from '../errors/http/httpNotFound';
+import { HttpForbidden } from '../errors/http/httpForbidden';
 import { HttpServerError } from '../errors/http/httpServer';
 import { NotFoundError } from '../errors/notFound';
 import { HttpExceptionFilter } from '../utils/httpFilter';
 import { TransformInterceptor } from '../utils/httpTransform';
+import { HttpNotFound } from './../errors/http/httpNotFound';
 import { CreateUserDto } from './dto/create.dto';
 import { UpdatePasswordDto } from './dto/update.dto';
 import { UserService } from './user.service';
@@ -42,10 +43,10 @@ export class UserController {
       return await this.userService.findOne(id);
     } catch (error) {
       if (error instanceof NotFoundError) {
-        throw new NotFoundError();
+        throw new HttpNotFound();
       }
 
-      throw new HttpNotFound();
+      throw new HttpServerError();
     }
   }
 
@@ -67,7 +68,7 @@ export class UserController {
       if (error instanceof NotFoundError) {
         throw new HttpNotFound();
       } else if (error instanceof AuthError) {
-        throw new AuthError();
+        throw new HttpForbidden();
       }
 
       throw new HttpServerError();

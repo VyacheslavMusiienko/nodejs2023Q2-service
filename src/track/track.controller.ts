@@ -21,6 +21,8 @@ import { HttpServerError } from './../errors/http/httpServer';
 import { CreateTrackDto } from './dto/create.dto';
 import { UpdateTrackDto } from './dto/update.dto';
 import { TrackService } from './track.service';
+import { AuthError } from '../errors/auth';
+import { HttpForbidden } from '../errors/http/httpForbidden';
 
 @Controller('track')
 @UseFilters(new HttpExceptionFilter())
@@ -64,7 +66,10 @@ export class TrackController {
     } catch (error) {
       if (error instanceof NotFoundError) {
         throw new HttpNotFound();
+      } else if (error instanceof AuthError) {
+        throw new HttpForbidden();
       }
+
       throw new HttpServerError();
     }
   }
