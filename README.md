@@ -18,26 +18,52 @@ cd ./nodejs2023Q2-service
 ```
 
 ```
-git checkout dev
+git checkout dev-v2
 ```
 
-Installing NPM modules
+## Installing NPM modules
 
 ```
 npm install
 ```
 
-Create .env file (based on .env.example)
+## Create .env file (based on .env.example)
 and you can change port number in .env file
 
 ```
 cp .env.example .env
 ```
+## Running application
 
-Start developer server
+- Create .env file (based on .env.example) in copied folder: ./.env
+- Run next command in your terminal, for building images and docker containers up:
+
+```
+docker-compose up -d
+```
+
+After docker compose command complete and dockers starting you can open in your browser OpenAPI documentation by typing http://localhost:4000/doc/ (port 4000 as default) and execute test queries.
+
+## Start developer server
 
 ```
 npm run start:dev
+```
+## Vulnerabilities scanning
+
+```
+npm run docker:scan
+```
+
+## Migrations
+
+Migrations execute automatically when ```docker-compose``` command complete and create database entities.
+
+If you want to migrate manually you can execute next command in your terminal:
+
+```
+rm -rf ./prisma/migrations
+npx prisma migrate dev --name my-custom-migrate
 ```
 
 After application running open new terminal and enter:
