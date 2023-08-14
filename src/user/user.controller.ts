@@ -13,13 +13,8 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { StatusCodes } from 'http-status-codes';
-import { AuthError } from '../errors/auth';
-import { HttpForbidden } from '../errors/http/httpForbidden';
-import { HttpServerError } from '../errors/http/httpServer';
-import { NotFoundError } from '../errors/notFound';
 import { HttpExceptionFilter } from '../utils/httpFilter';
 import { TransformInterceptor } from '../utils/httpTransform';
-import { HttpNotFound } from './../errors/http/httpNotFound';
 import { CreateUserDto } from './dto/create.dto';
 import { UpdatePasswordDto } from './dto/update.dto';
 import { UserService } from './user.service';
@@ -39,15 +34,7 @@ export class UserController {
   @Header('Content-Type', 'application/json')
   @Get(':id')
   async findOne(@Param('id', ParseUUIDPipe) id: string) {
-    try {
-      return await this.userService.findOne(id);
-    } catch (error) {
-      if (error instanceof NotFoundError) {
-        throw new HttpNotFound();
-      }
-
-      throw new HttpServerError();
-    }
+    return await this.userService.findOne(id);
   }
 
   @Header('Content-Type', 'application/json')
@@ -62,31 +49,13 @@ export class UserController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updatePassword: UpdatePasswordDto,
   ) {
-    try {
-      return await this.userService.update(id, updatePassword);
-    } catch (error) {
-      if (error instanceof NotFoundError) {
-        throw new HttpNotFound();
-      } else if (error instanceof AuthError) {
-        throw new HttpForbidden();
-      }
-
-      throw new HttpServerError();
-    }
+    return await this.userService.update(id, updatePassword);
   }
 
   @Delete(':id')
   @Header('Content-Type', 'application/json')
   @HttpCode(StatusCodes.NO_CONTENT)
   async remove(@Param('id', ParseUUIDPipe) id: string) {
-    try {
-      return await this.userService.remove(id);
-    } catch (error) {
-      if (error instanceof NotFoundError) {
-        throw new HttpNotFound();
-      }
-
-      throw new HttpServerError();
-    }
+    return await this.userService.remove(id);
   }
 }
