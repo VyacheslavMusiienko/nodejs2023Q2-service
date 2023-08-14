@@ -1,86 +1,84 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+import { plainToClass } from 'class-transformer';
 import { v4 as uuidv4 } from 'uuid';
-import { Album } from '../album/entity/album.entity';
-import { DatabaseService } from '../database/database.service';
-import { NotFoundError } from '../errors/notFound';
-import { Track } from '../track/entity/track.entity';
+import { PrismaService } from './../database/prisma/prisma.service';
 import { CreateArtistDto } from './dto/create.dto';
 import { UpdateArtistDto } from './dto/updata.dto';
 import { Artist } from './entity/artist.entity';
 
 @Injectable()
 export class ArtistService {
-  constructor(private databaseService: DatabaseService) {}
+  constructor(private prismaService: PrismaService) {}
 
-  async findAll() {
-    return await this.databaseService.artists.find();
+  async findAll(): Promise<Artist[]> {
+    const artists = await this.prismaService.artist.findMany();
+    return artists.map((artist) => plainToClass(Artist, artist));
   }
 
-  async findOne(id: string) {
-    const findTArtist = await this.databaseService.artists.findUnique({ id });
-    if (findTArtist === null) {
-      throw new NotFoundError();
+  async findOne(id: string): Promise<Artist | null> {
+    const findArtist = await this.prismaService.artist.findUnique({
+      where: { id },
+    });
+
+    if (!findArtist) {
+      return null;
     }
 
-    return findTArtist;
+    return plainToClass(Artist, findArtist);
   }
 
-  async create(createArtist: CreateArtistDto) {
+  async create(createArtist: CreateArtistDto): Promise<Artist> {
     const artist = new Artist({
       id: uuidv4(),
       ...createArtist,
     });
-
-    return await this.databaseService.artists.create(artist);
-  }
-
-  async update(id: string, updateArtist: UpdateArtistDto) {
-    const findArtist = await this.databaseService.artists.findUnique({ id });
-
-    if (findArtist === null) {
-      throw new NotFoundError();
-    }
-
-    const updatedArtist = new Artist({ ...findArtist, ...updateArtist });
-
-    return await this.databaseService.artists.update(id, updatedArtist);
-  }
-
-  async remove(id: string) {
-    const isArtist = await this.databaseService.artists.has(id);
-    if (!isArtist) {
-      throw new NotFoundError();
-    }
-
-    await this.databaseService.favorites.artists.delete(id);
-
-    const tracks: Track[] = await this.databaseService.tracks.find();
-
-    tracks.forEach(async (track) => {
-      if (track.artistId === id) {
-        const updatedTrack = {
-          ...track,
-          artistId: null,
-        };
-
-        await this.databaseService.tracks.update(track.id, updatedTrack);
-      }
+    const artistResponse = await this.prismaService.artist.create({
+      data: artist,
     });
 
-    // Remove from albums
-    const albums: Album[] = await this.databaseService.albums.find();
+    return plainToClass(Artist, artistResponse);
+  }
 
-    albums.forEach(async (album) => {
-      if (album.artistId === id) {
-        const updatedAlbum = {
-          ...album,
-          artistId: null,
-        };
+  async update(
+    id: string,
+    updateArtist: UpdateArtistDto,
+  ): Promise<Artist | null> {
+    try {
+      const updatedArtist = await this.prismaService.artist.update({
+        where: { id },
+        data: updateArtist,
+      });
 
-        await this.databaseService.albums.update(album.id, updatedAlbum);
+      return plainToClass(Artist, updatedArtist);
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        return null;
       }
-    });
 
-    return await this.databaseService.artists.remove({ id });
+      throw error;
+    }
+  }
+
+  async remove(id: string): Promise<boolean> {
+    try {
+      await this.prismaService.artist.delete({
+        where: { id },
+      });
+
+      return true;
+    } catch (err) {
+      if (
+        err instanceof Prisma.PrismaClientKnownRequestError &&
+        err.code === 'P2025'
+      ) {
+        return false;
+      }
+
+      throw err;
+    }
   }
 }

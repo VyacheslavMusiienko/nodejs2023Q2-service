@@ -5,6 +5,7 @@ import {
   Get,
   Header,
   HttpCode,
+  NotFoundException,
   Param,
   ParseUUIDPipe,
   Post,
@@ -13,14 +14,11 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { StatusCodes } from 'http-status-codes';
-import { HttpNotFound } from '../errors/http/httpNotFound';
-import { HttpServerError } from '../errors/http/httpServer';
 import { HttpExceptionFilter } from '../utils/httpFilter';
 import { TransformInterceptor } from '../utils/httpTransform';
 import { AlbumService } from './album.service';
 import { CreateAlbumDto } from './dto/create.dto';
 import { UpdateAlbumDto } from './dto/update.dto';
-import { NotFoundError } from '../errors/notFound';
 
 @Controller('album')
 @UseFilters(new HttpExceptionFilter())
@@ -37,15 +35,13 @@ export class AlbumController {
   @Get(':id')
   @Header('Content-Type', 'application/json')
   async findOne(@Param('id', ParseUUIDPipe) id: string) {
-    try {
-      return await this.albumService.findOne(id);
-    } catch (error) {
-      if (error instanceof NotFoundError) {
-        throw new HttpNotFound();
-      }
+    const album = await this.albumService.findOne(id);
 
-      throw new HttpServerError();
+    if (!album) {
+      throw new NotFoundException('Album not found');
     }
+
+    return album;
   }
 
   @Post()
@@ -58,31 +54,25 @@ export class AlbumController {
   @Header('Content-Type', 'application/json')
   async update(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() UpdateAlbum: UpdateAlbumDto,
+    @Body() updateAlbum: UpdateAlbumDto,
   ) {
-    try {
-      return await this.albumService.update(id, UpdateAlbum);
-    } catch (error) {
-      if (error instanceof NotFoundError) {
-        throw new HttpNotFound();
-      }
+    const updatedAlbum = await this.albumService.update(id, updateAlbum);
 
-      throw new HttpServerError();
+    if (!updatedAlbum) {
+      throw new NotFoundException('Album not found');
     }
+
+    return updatedAlbum;
   }
 
   @Delete(':id')
   @Header('Content-Type', 'application/json')
   @HttpCode(StatusCodes.NO_CONTENT)
   async delete(@Param('id', ParseUUIDPipe) id: string) {
-    try {
-      return await this.albumService.remove(id);
-    } catch (error) {
-      if (error instanceof NotFoundError) {
-        throw new HttpNotFound();
-      }
+    const result = await this.albumService.remove(id);
 
-      throw new HttpServerError();
+    if (!result) {
+      throw new NotFoundException('Album not found');
     }
   }
 }

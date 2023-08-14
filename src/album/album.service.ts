@@ -1,31 +1,32 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+import { plainToClass } from 'class-transformer';
 import { v4 as uuidv4 } from 'uuid';
-import { DatabaseService } from '../database/database.service';
-import { NotFoundError } from '../errors/notFound';
+import { PrismaService } from '../database/prisma/prisma.service';
 import { CreateAlbumDto } from './dto/create.dto';
 import { UpdateAlbumDto } from './dto/update.dto';
 import { Album } from './entity/album.entity';
-import { Track } from '../track/entity/track.entity';
 
 @Injectable()
 export class AlbumService {
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
-  async findAll() {
-    return await this.databaseService.albums.find();
+  async findAll(): Promise<Album[]> {
+    const albums = await this.prismaService.album.findMany();
+    return albums.map((album) => plainToClass(Album, album));
   }
 
-  async findOne(id: string) {
-    const findAlbum = this.databaseService.albums.findUnique({ id });
+  async findOne(id: string): Promise<Album | null> {
+    const findAlbum = this.prismaService.album.findUnique({ where: { id } });
 
-    if (findAlbum === null) {
-      throw new NotFoundError();
+    if (!findAlbum) {
+      null;
     }
 
-    return findAlbum;
+    return plainToClass(Album, findAlbum);
   }
 
-  async create({ name, year, artistId }: CreateAlbumDto) {
+  async create({ name, year, artistId }: CreateAlbumDto): Promise<Album> {
     const album = new Album({
       id: uuidv4(),
       name,
@@ -33,45 +34,42 @@ export class AlbumService {
       artistId: artistId || null,
     });
 
-    return await this.databaseService.albums.create(album);
+    const newAlbum = await this.prismaService.album.create({ data: album });
+
+    return plainToClass(Album, newAlbum);
   }
-
-  async update(id: string, updateAlbum: UpdateAlbumDto) {
-    const foundAlbum = await this.databaseService.albums.findUnique({ id });
-
-    if (foundAlbum === null) {
-      throw new NotFoundError();
-    }
-
-    const updatedTrack = new Album({
-      ...foundAlbum,
-      ...updateAlbum,
-    });
-
-    return await this.databaseService.albums.update(id, updatedTrack);
-  }
-
-  async remove(id: string) {
-    const isAlbum = await this.databaseService.albums.has(id);
-    if (!isAlbum) {
-      throw new NotFoundError();
-    }
-
-    await this.databaseService.favorites.albums.delete(id);
-
-    const tracks: Track[] = await this.databaseService.tracks.find();
-
-    tracks.forEach(async (track) => {
-      if (track.albumId === id) {
-        const updatedTrack = {
-          ...track,
-          albumId: null,
-        };
-
-        await this.databaseService.tracks.update(track.id, updatedTrack);
+  async update(id: string, updateAlbum: UpdateAlbumDto): Promise<Album | null> {
+    try {
+      const updateAlbumResponse = await this.prismaService.album.update({
+        where: { id },
+        data: updateAlbum,
+      });
+      return plainToClass(Album, updateAlbumResponse);
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        return null;
       }
-    });
 
-    return await this.databaseService.albums.remove({ id });
+      throw error;
+    }
+  }
+
+  async remove(id: string): Promise<boolean> {
+    try {
+      await this.prismaService.album.delete({ where: { id } });
+      return true;
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        return false;
+      }
+
+      throw error;
+    }
   }
 }

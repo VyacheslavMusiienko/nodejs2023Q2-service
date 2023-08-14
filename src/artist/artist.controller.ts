@@ -5,6 +5,7 @@ import {
   Get,
   Header,
   HttpCode,
+  NotFoundException,
   Param,
   ParseUUIDPipe,
   Post,
@@ -13,11 +14,8 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { StatusCodes } from 'http-status-codes';
-import { NotFoundError } from '../errors/notFound';
 import { HttpExceptionFilter } from '../utils/httpFilter';
 import { TransformInterceptor } from '../utils/httpTransform';
-import { HttpNotFound } from './../errors/http/httpNotFound';
-import { HttpServerError } from './../errors/http/httpServer';
 import { ArtistService } from './artist.service';
 import { CreateArtistDto } from './dto/create.dto';
 import { UpdateArtistDto } from './dto/updata.dto';
@@ -40,11 +38,13 @@ export class ArtistController {
     try {
       return await this.artistService.findOne(id);
     } catch (error) {
-      if (error instanceof NotFoundError) {
-        throw new HttpNotFound();
+      const artist = await this.artistService.findOne(id);
+
+      if (!artist) {
+        throw new NotFoundException('Artist not found');
       }
 
-      throw new HttpServerError();
+      return artist;
     }
   }
 
@@ -60,29 +60,23 @@ export class ArtistController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateArtist: UpdateArtistDto,
   ) {
-    try {
-      return await this.artistService.update(id, updateArtist);
-    } catch (error) {
-      if (error instanceof NotFoundError) {
-        throw new HttpNotFound();
-      }
+    const updatedArtist = await this.artistService.update(id, updateArtist);
 
-      throw new HttpServerError();
+    if (!updatedArtist) {
+      throw new NotFoundException('Artist not found');
     }
+
+    return updatedArtist;
   }
 
   @Delete(':id')
   @Header('Content-Type', 'application/json')
   @HttpCode(StatusCodes.NO_CONTENT)
   async remove(@Param('id', ParseUUIDPipe) id: string) {
-    try {
-      return await this.artistService.remove(id);
-    } catch (error) {
-      if (error instanceof NotFoundError) {
-        throw new HttpNotFound();
-      }
+    const result = await this.artistService.remove(id);
 
-      throw new HttpServerError();
+    if (!result) {
+      throw new NotFoundException('Artist not found');
     }
   }
 }

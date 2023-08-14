@@ -5,6 +5,7 @@ import {
   Get,
   Header,
   HttpCode,
+  NotFoundException,
   Param,
   ParseUUIDPipe,
   Post,
@@ -13,16 +14,11 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { StatusCodes } from 'http-status-codes';
-import { NotFoundError } from '../errors/notFound';
 import { HttpExceptionFilter } from '../utils/httpFilter';
 import { TransformInterceptor } from '../utils/httpTransform';
-import { HttpNotFound } from './../errors/http/httpNotFound';
-import { HttpServerError } from './../errors/http/httpServer';
 import { CreateTrackDto } from './dto/create.dto';
 import { UpdateTrackDto } from './dto/update.dto';
 import { TrackService } from './track.service';
-import { AuthError } from '../errors/auth';
-import { HttpForbidden } from '../errors/http/httpForbidden';
 
 @Controller('track')
 @UseFilters(new HttpExceptionFilter())
@@ -38,15 +34,13 @@ export class TrackController {
 
   @Get(':id')
   async findOne(@Param('id', ParseUUIDPipe) id: string) {
-    try {
-      return await this.trackService.findOne(id);
-    } catch (error) {
-      if (error instanceof NotFoundError) {
-        throw new HttpNotFound();
-      }
+    const track = await this.trackService.findOne(id);
 
-      throw new HttpServerError();
+    if (!track) {
+      throw new NotFoundException('Track not found');
     }
+
+    return track;
   }
 
   @Post()
@@ -61,31 +55,23 @@ export class TrackController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateTrack: UpdateTrackDto,
   ) {
-    try {
-      return await this.trackService.update(id, updateTrack);
-    } catch (error) {
-      if (error instanceof NotFoundError) {
-        throw new HttpNotFound();
-      } else if (error instanceof AuthError) {
-        throw new HttpForbidden();
-      }
+    const updatedTrack = await this.trackService.update(id, updateTrack);
 
-      throw new HttpServerError();
+    if (!updatedTrack) {
+      throw new NotFoundException('Track not found');
     }
+
+    return updatedTrack;
   }
 
   @Delete(':id')
   @Header('Content-Type', 'application/json')
   @HttpCode(StatusCodes.NO_CONTENT)
   async remove(@Param('id', ParseUUIDPipe) id: string) {
-    try {
-      return await this.trackService.remove(id);
-    } catch (error) {
-      if (error instanceof NotFoundError) {
-        throw new HttpNotFound();
-      }
+    const result = await this.trackService.remove(id);
 
-      throw new HttpServerError();
+    if (!result) {
+      throw new NotFoundException('Track not found');
     }
   }
 }
