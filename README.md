@@ -5,10 +5,20 @@
 - Git - [Download & Install Git](https://git-scm.com/downloads).
 - Node.js - [Download & Install Node.js](https://nodejs.org/en/download/) and the npm package manager.
 
-## Downloading
+## Running application
+
+Clone repository
 
 ```
-git clone {repository URL}
+git clone https://github.com/VyacheslavMusiienko/nodejs2023Q2-service.git
+```
+
+```
+cd ./nodejs2023Q2-service
+```
+
+```
+git checkout dev-v2
 ```
 
 ## Installing NPM modules
@@ -17,56 +27,57 @@ git clone {repository URL}
 npm install
 ```
 
+## Create .env file (based on .env.example)
+and you can change port number in .env file
+
+```
+cp .env.example .env
+```
 ## Running application
 
+- Create .env file (based on .env.example) in copied folder: ./.env
+- Run next command in your terminal, for building images and docker containers up:
+
 ```
-npm start
+docker-compose up -d
 ```
 
-After starting the app on port (4000 as default) you can open
-in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
-For more information about OpenAPI/Swagger please visit https://swagger.io/.
+After docker compose command complete and dockers starting you can open in your browser OpenAPI documentation by typing http://localhost:4000/doc/ (port 4000 as default) and execute test queries.
 
-## Testing
+## Start developer server
+
+```
+npm run start:dev
+```
+## Vulnerabilities scanning
+
+```
+npm run docker:scan
+```
+
+## Migrations
+
+Migrations execute automatically when ```docker-compose``` command complete and create database entities.
+
+If you want to migrate manually you can execute next command in your terminal:
+
+```
+rm -rf ./prisma/migrations
+npx prisma migrate dev --name my-custom-migrate
+```
 
 After application running open new terminal and enter:
-
-To run all tests without authorization
 
 ```
 npm run test
 ```
 
-To run only one of all test suites
+After starting the app on port (4000 as default) you can open
+in your browser OpenAPI documentation by typing http://localhost:4000/doc (only developer mode).
 
-```
-npm run test -- <path to suite>
-```
+You can download OpenAPI Specification in JSON or YAML format  by typing http://localhost:4000/docs-json
+or http://localhost:4000/docs-yaml (only developer mode)
 
-To run all test with authorization
+**You will check OpenAPI spec in doc folder corresponds with assignment**
 
-```
-npm run test:auth
-```
-
-To run only specific test suite with authorization
-
-```
-npm run test:auth -- <path to suite>
-```
-
-### Auto-fix and format
-
-```
-npm run lint
-```
-
-```
-npm run format
-```
-
-### Debugging in VSCode
-
-Press <kbd>F5</kbd> to debug.
-
-For more information, visit: https://code.visualstudio.com/docs/editor/debugging
+For more information about OpenAPI/Swagger please visit https://swagger.io/.
