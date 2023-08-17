@@ -4,20 +4,21 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { v4 as uuidv4 } from 'uuid';
 import { PrismaService } from '../database/prisma/prisma.service';
 
 @Injectable()
 export class FavoriteService {
-  #favoritesId: number;
+  #favoritesId: string;
   constructor(private readonly prismaService: PrismaService) {
-    this.#favoritesId = 1;
+    this.#favoritesId = uuidv4();
   }
 
   async findAll() {
     const findManyFavorites = await this.prismaService.favorites.findMany({
-      // where: {
-      // id: this.#favoritesId,
-      // },
+      where: {
+        id: this.#favoritesId,
+      },
       include: {
         albums: {
           select: {
@@ -58,7 +59,7 @@ export class FavoriteService {
     try {
       await this.prismaService.trackToFavorite.create({
         data: {
-          favoritesId: this.#favoritesId,
+          favoritesId: uuidv4(),
           trackId: id,
         },
       });
@@ -115,6 +116,7 @@ export class FavoriteService {
     try {
       await this.prismaService.albumToFavorite.delete({
         where: {
+          favoritesId: this.#favoritesId,
           albumId: id,
         },
       });

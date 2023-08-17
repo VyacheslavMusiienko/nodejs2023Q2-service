@@ -8,7 +8,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
+model User {
   id        String   @id @default(uuid())
   login     String
   password  String
@@ -17,7 +17,7 @@ datasource db {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("users")
-}model User {
+}
 
 model Artist {
   id        String             @id @default(uuid())
@@ -56,7 +56,7 @@ model Track {
 }
 
 model Favorites {
-  id      Int                @id @default(2023)
+  id      String             @id @default(uuid())
   artists ArtistToFavorite[]
   albums  AlbumToFavorite[]
   tracks  TrackToFavorite[]
@@ -68,7 +68,7 @@ model ArtistToFavorite {
   artistId    String    @id @map("artist_id")
   artist      Artist    @relation(fields: [artistId], references: [id], onDelete: Cascade)
   favorites   Favorites @relation(fields: [favoritesId], references: [id])
-  favoritesId Int
+  favoritesId String
 
   @@map("artist_to_favorite")
 }
@@ -77,7 +77,7 @@ model AlbumToFavorite {
   albumId     String    @id @map("album_id")
   album       Album     @relation(fields: [albumId], references: [id], onDelete: Cascade)
   favorites   Favorites @relation(fields: [favoritesId], references: [id])
-  favoritesId Int
+  favoritesId String
 
   @@map("album_to_favorite")
 }
@@ -86,7 +86,7 @@ model TrackToFavorite {
   trackId     String     @id @map("track_id")
   track       Track      @relation(fields: [trackId], references: [id], onDelete: Cascade)
   favorites   Favorites? @relation(fields: [favoritesId], references: [id])
-  favoritesId Int?
+  favoritesId String
 
   @@map("track_to_favorite")
 }

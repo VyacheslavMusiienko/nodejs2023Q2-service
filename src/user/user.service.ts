@@ -50,7 +50,7 @@ export class UserService {
     return plainToClass(User, user);
   }
 
-  async update(id: string, { oldPassword, newPassword }: UpdatePasswordDto) {
+  async update(id: string, { newPassword, oldPassword }: UpdatePasswordDto) {
     const user = await this.prismaService.user.findUnique({
       where: { id: id },
     });
@@ -66,9 +66,18 @@ export class UserService {
         },
       });
 
-      return await this.prismaService.user.findUnique({
+      const updatedUser = await this.prismaService.user.findUnique({
         where: { id: id },
+        select: {
+          id: true,
+          version: true,
+          login: true,
+          createdAt: true,
+          updatedAt: true,
+        },
       });
+
+      return plainToClass(User, updatedUser);
     }
 
     throw new ForbiddenException(`User oldPassword is wrong`);
