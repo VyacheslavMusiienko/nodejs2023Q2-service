@@ -1,4 +1,4 @@
-import { Exclude } from 'class-transformer';
+import { Exclude, Transform } from 'class-transformer';
 
 export class User {
   readonly id: string;
@@ -7,8 +7,12 @@ export class User {
   @Exclude()
   readonly password: string;
   readonly version: number;
-  readonly createdAt: number;
-  readonly updatedAt: number;
+
+  @Transform(({ value }) => value.getTime(), { toPlainOnly: true })
+  readonly createdAt: Date;
+
+  @Transform(({ value }) => value.getTime(), { toPlainOnly: true })
+  readonly updatedAt: Date;
 
   constructor(partial: Partial<User>) {
     Object.assign(this, partial);

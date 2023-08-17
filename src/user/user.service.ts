@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { plainToClass } from 'class-transformer';
+import { v4 as uuidv4 } from 'uuid';
 import { PrismaService } from '../database/prisma/prisma.service';
 import { CreateUserDto } from './dto/create.dto';
 import { UpdatePasswordDto } from './dto/update.dto';
@@ -32,7 +33,16 @@ export class UserService {
     return plainToClass(User, user);
   }
 
-  async create(newUser: CreateUserDto): Promise<User> {
+  async create({ login, password }: CreateUserDto): Promise<User> {
+    const newUser = new User({
+      id: uuidv4(),
+      login,
+      password: password,
+      version: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
     const user = await this.prismaService.user.create({
       data: newUser,
     });

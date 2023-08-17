@@ -5,6 +5,7 @@ import {
   Get,
   Header,
   HttpCode,
+  NotFoundException,
   Param,
   ParseUUIDPipe,
   Post,
@@ -34,7 +35,13 @@ export class UserController {
   @Header('Content-Type', 'application/json')
   @Get(':id')
   async findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return await this.userService.findOne(id);
+    const user = await this.userService.findOne(id);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
   }
 
   @Header('Content-Type', 'application/json')
@@ -56,6 +63,10 @@ export class UserController {
   @Header('Content-Type', 'application/json')
   @HttpCode(StatusCodes.NO_CONTENT)
   async remove(@Param('id', ParseUUIDPipe) id: string) {
-    return await this.userService.remove(id);
+    const remove = await this.userService.remove(id);
+
+    if (!remove) {
+      throw new NotFoundException('Artist not found');
+    }
   }
 }
