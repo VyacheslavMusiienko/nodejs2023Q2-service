@@ -35,17 +35,13 @@ export class ArtistController {
   @Get(':id')
   @Header('Content-Type', 'application/json')
   async findOne(@Param('id', ParseUUIDPipe) id: string) {
-    try {
-      return await this.artistService.findOne(id);
-    } catch (error) {
-      const artist = await this.artistService.findOne(id);
+    const artist = await this.artistService.findOne(id);
 
-      if (!artist) {
-        throw new NotFoundException('Artist not found');
-      }
-
-      return artist;
+    if (!artist) {
+      throw new NotFoundException('Artist not found');
     }
+
+    return artist;
   }
 
   @Post()
