@@ -15,155 +15,126 @@ export class FavoriteService {
   }
 
   async findAll() {
-    const findManyFavorites = await this.prismaService.favorites.findMany({
-      where: {
-        id: this.#favoritesId,
-      },
-      include: {
-        albums: {
-          select: {
-            album: true,
-          },
-        },
-        tracks: {
-          select: {
-            track: true,
-          },
-        },
-        artists: {
-          select: {
-            artist: true,
-          },
-        },
-      },
-    });
-
-    if (findManyFavorites.length === 0) {
-      return {
-        artists: [],
-        albums: [],
-        tracks: [],
-      };
-    }
-
-    const favorites = findManyFavorites[0];
+    const [artists, albums, tracks] = await Promise.all([
+      this.prismaService.artistToFavorite.findMany({
+        select: { artist: true },
+      }),
+      this.prismaService.albumToFavorite.findMany({ select: { album: true } }),
+      this.prismaService.trackToFavorite.findMany({ select: { track: true } }),
+    ]);
 
     return {
-      artists: favorites.artists.map((artistInfo) => artistInfo.artist),
-      albums: favorites.albums.map((albumInfo) => albumInfo.album),
-      tracks: favorites.tracks.map((trackInfo) => trackInfo.track),
+      artists: artists.map(({ artist }) => artist),
+      albums: albums.map(({ album }) => album),
+      tracks: tracks.map(({ track }) => track),
     };
   }
 
   async createTrack(id: string) {
     try {
       await this.prismaService.trackToFavorite.create({
-        data: {
-          favoritesId: uuidv4(),
-          trackId: id,
-        },
+        data: { trackId: id },
       });
-
-      return 'Add track to the favorites';
-    } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2003'
-      ) {
-        throw new UnprocessableEntityException(`Artist was not found`);
-      } else throw error;
+      return { message: 'Add track to the favorites' };
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        if (err.code === 'P2003') {
+          throw new UnprocessableEntityException(`Track with ${id} not found`);
+        }
+        if (err.code === 'P2002') {
+          return { message: 'Track already exist in favorites' };
+        }
+      }
+      throw err;
     }
   }
 
   async removeTrack(id: string) {
     try {
       await this.prismaService.trackToFavorite.delete({
-        where: {
-          trackId: id,
-        },
+        where: { trackId: id },
       });
-    } catch (error) {
+      return { message: 'Remove track from the favorites' };
+    } catch (err) {
       if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2025'
+        err instanceof Prisma.PrismaClientKnownRequestError &&
+        err.code === 'P2025'
       ) {
-        throw new NotFoundException(`Track was not found`);
-      } else throw error;
+        throw new NotFoundException(`Track with ${id} not found`);
+      }
+      throw err;
     }
   }
 
   async createAlbum(id: string) {
     try {
       await this.prismaService.albumToFavorite.create({
-        data: {
-          favoritesId: this.#favoritesId,
-          albumId: id,
-        },
+        data: { albumId: id },
       });
-
-      return 'Add album to the favorites';
-    } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2003'
-      ) {
-        throw new UnprocessableEntityException(`Artist was not found`);
-      } else throw error;
+      return { message: 'Add album to the favorites' };
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        if (err.code === 'P2003') {
+          throw new UnprocessableEntityException(`Album with ${id} not found`);
+        }
+        if (err.code === 'P2002') {
+          return { message: 'Album already exist in favorites' };
+        }
+      }
+      throw err;
     }
   }
 
   async removeAlbum(id: string) {
     try {
       await this.prismaService.albumToFavorite.delete({
-        where: {
-          favoritesId: this.#favoritesId,
-          albumId: id,
-        },
+        where: { albumId: id },
       });
-    } catch (error) {
+      return { message: 'Remove album from the favorites' };
+    } catch (err) {
       if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2025'
+        err instanceof Prisma.PrismaClientKnownRequestError &&
+        err.code === 'P2025'
       ) {
-        throw new NotFoundException(`Album was not found`);
-      } else throw error;
+        throw new NotFoundException(`Album with ${id} not found`);
+      }
+      throw err;
     }
   }
 
   async createArtist(id: string) {
     try {
       await this.prismaService.artistToFavorite.create({
-        data: {
-          favoritesId: this.#favoritesId,
-          artistId: id,
-        },
+        data: { artistId: id },
       });
-
-      return 'Add artist to the favorites';
-    } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2003'
-      ) {
-        throw new UnprocessableEntityException(`Artist was not found`);
-      } else throw error;
+      return { message: 'Add artist to the favorites' };
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        if (err.code === 'P2003') {
+          throw new UnprocessableEntityException(`Artist with ${id} not found`);
+        }
+        if (err.code === 'P2002') {
+          return { message: 'Artist already exist in favorites' };
+        }
+      }
+      throw err;
     }
   }
 
   async removeArtist(id: string) {
     try {
       await this.prismaService.artistToFavorite.delete({
-        where: {
-          artistId: id,
-        },
+        where: { artistId: id },
       });
-    } catch (error) {
+      return { message: 'Remove artist from the favorites' };
+    } catch (err) {
       if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2025'
+        err instanceof Prisma.PrismaClientKnownRequestError &&
+        err.code === 'P2025'
       ) {
-        throw new NotFoundException(`Artist was not found`);
-      } else throw error;
+        throw new NotFoundException(`Artist with ${id} not found`);
+      }
+      throw err;
     }
   }
 }

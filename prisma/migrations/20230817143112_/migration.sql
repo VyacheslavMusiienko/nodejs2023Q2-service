@@ -41,35 +41,37 @@ CREATE TABLE "tracks" (
 );
 
 -- CreateTable
-CREATE TABLE "favorites" (
-    "id" INTEGER NOT NULL DEFAULT 2023,
-
-    CONSTRAINT "favorites_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "artist_to_favorite" (
+    "id" TEXT NOT NULL,
     "artist_id" TEXT NOT NULL,
-    "favoritesId" INTEGER NOT NULL,
 
-    CONSTRAINT "artist_to_favorite_pkey" PRIMARY KEY ("artist_id")
+    CONSTRAINT "artist_to_favorite_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "album_to_favorite" (
+    "id" TEXT NOT NULL,
     "album_id" TEXT NOT NULL,
-    "favoritesId" INTEGER NOT NULL,
 
-    CONSTRAINT "album_to_favorite_pkey" PRIMARY KEY ("album_id")
+    CONSTRAINT "album_to_favorite_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "track_to_favorite" (
+    "id" TEXT NOT NULL,
     "track_id" TEXT NOT NULL,
-    "favoritesId" INTEGER,
 
-    CONSTRAINT "track_to_favorite_pkey" PRIMARY KEY ("track_id")
+    CONSTRAINT "track_to_favorite_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "artist_to_favorite_artist_id_key" ON "artist_to_favorite"("artist_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "album_to_favorite_album_id_key" ON "album_to_favorite"("album_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "track_to_favorite_track_id_key" ON "track_to_favorite"("track_id");
 
 -- AddForeignKey
 ALTER TABLE "albums" ADD CONSTRAINT "albums_artist_id_fkey" FOREIGN KEY ("artist_id") REFERENCES "artists"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -84,16 +86,7 @@ ALTER TABLE "tracks" ADD CONSTRAINT "tracks_album_id_fkey" FOREIGN KEY ("album_i
 ALTER TABLE "artist_to_favorite" ADD CONSTRAINT "artist_to_favorite_artist_id_fkey" FOREIGN KEY ("artist_id") REFERENCES "artists"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "artist_to_favorite" ADD CONSTRAINT "artist_to_favorite_favoritesId_fkey" FOREIGN KEY ("favoritesId") REFERENCES "favorites"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "album_to_favorite" ADD CONSTRAINT "album_to_favorite_album_id_fkey" FOREIGN KEY ("album_id") REFERENCES "albums"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "album_to_favorite" ADD CONSTRAINT "album_to_favorite_favoritesId_fkey" FOREIGN KEY ("favoritesId") REFERENCES "favorites"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "track_to_favorite" ADD CONSTRAINT "track_to_favorite_track_id_fkey" FOREIGN KEY ("track_id") REFERENCES "tracks"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "track_to_favorite" ADD CONSTRAINT "track_to_favorite_favoritesId_fkey" FOREIGN KEY ("favoritesId") REFERENCES "favorites"("id") ON DELETE SET NULL ON UPDATE CASCADE;

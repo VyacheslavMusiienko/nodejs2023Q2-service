@@ -30,9 +30,7 @@ export class FavoriteController {
   @Post('/track/:id')
   @Header('Content-Type', 'application/json')
   async createTrack(@Param('id', ParseUUIDPipe) id: string) {
-    const response = await this.favoriteService.createTrack(id);
-    const message = { response };
-    return message;
+    return await this.favoriteService.createTrack(id);
   }
 
   @Delete('/track/:id')
@@ -45,9 +43,7 @@ export class FavoriteController {
   @Post('/album/:id')
   @Header('Content-Type', 'application/json')
   async createAlbum(@Param('id', ParseUUIDPipe) id: string) {
-    const response = await this.favoriteService.createAlbum(id);
-    const message = { response };
-    return message;
+    return await this.favoriteService.createAlbum(id);
   }
 
   @Delete('/album/:id')
@@ -60,9 +56,7 @@ export class FavoriteController {
   @Post('/artist/:id')
   @Header('Content-Type', 'application/json')
   async createArtist(@Param('id', ParseUUIDPipe) id: string) {
-    const response = await this.favoriteService.createArtist(id);
-    const message = { response };
-    return message;
+    return await this.favoriteService.createArtist(id);
   }
 
   @Delete('/artist/:id')
