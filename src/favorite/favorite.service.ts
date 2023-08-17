@@ -15,9 +15,9 @@ export class FavoriteService {
 
   async findAll() {
     const findManyFavorites = await this.prismaService.favorites.findMany({
-      where: {
-        id: this.#favoritesId,
-      },
+      // where: {
+      // id: this.#favoritesId,
+      // },
       include: {
         albums: {
           select: {
@@ -36,6 +36,14 @@ export class FavoriteService {
         },
       },
     });
+
+    if (findManyFavorites.length === 0) {
+      return {
+        artists: [],
+        albums: [],
+        tracks: [],
+      };
+    }
 
     const favorites = findManyFavorites[0];
 
