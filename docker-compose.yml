@@ -9,19 +9,28 @@ services:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
     networks:
       - custom-service
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+    env_file:
+      - .env
+    command:
+      [
+        'postgres',
+        '-c',
+        'logging_collector=on',
+        '-c',
+        'log_statement=all',
+        '-c',
+        'log_directory=/logs',
+      ]
     volumes:
-      - pgdata:/var/lib/postgresql/data
-    command: postgres -c logging_collector=on -c log_destination=stderr -c log_directory=/logs
-  node:
-    container_name: node
+      - ./pgdata:/var/lib/postgresql/data
+      - ./pglogs:/logs
+  app:
+    container_name: app
     restart: always
-    build: .
+    build: ./
     volumes:
-      - ./src:/app/src
+      - .:/app/src
+      - node-modules:/usr/app/node_modules
     ports:
       - ${PORT}:${PORT}
     depends_on:
@@ -39,4 +48,7 @@ networks:
     driver: bridge
 
 volumes:
+  logs:
   pgdata:
+  app:
+  node-modules:

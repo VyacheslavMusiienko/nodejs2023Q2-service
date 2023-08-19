@@ -1,7 +1,6 @@
 FROM node:18-alpine
 WORKDIR /app
 COPY ["package.json", "package-lock.json*", "./"]
-COPY prisma ./prisma
+RUN npm ci && npm cache clean --force
 COPY . .
-RUN npm ci && npx prisma generate && npm cache clean --force
-CMD ["npm", "run", "start:dev"]
+CMD ["npm", "run", "start:prisma"]
