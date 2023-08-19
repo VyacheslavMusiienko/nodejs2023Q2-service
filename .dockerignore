@@ -1,8 +1,11 @@
 dist
 node_modules
 doc
-postgres-db
 Dockerfile
-test
 docker-compose.yml
 .dockerignore
+.git
+.gitignore
+.vscode
+.env
+.idea

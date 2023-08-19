@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { plainToClass } from 'class-transformer';
 import { v4 as uuidv4 } from 'uuid';
 import { PrismaService } from '../database/prisma/prisma.service';
@@ -90,7 +90,7 @@ export class UserService {
       return true;
     } catch (error) {
       if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error instanceof PrismaClientKnownRequestError &&
         error.code === 'P2025'
       ) {
         return false;

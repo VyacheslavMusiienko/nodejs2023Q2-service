@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { plainToClass } from 'class-transformer';
 import { v4 as uuidv4 } from 'uuid';
 import { PrismaService } from './../database/prisma/prisma.service';
@@ -53,7 +53,7 @@ export class ArtistService {
       return plainToClass(Artist, updatedArtist);
     } catch (error) {
       if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error instanceof PrismaClientKnownRequestError &&
         error.code === 'P2025'
       ) {
         return null;
@@ -72,7 +72,7 @@ export class ArtistService {
       return true;
     } catch (err) {
       if (
-        err instanceof Prisma.PrismaClientKnownRequestError &&
+        err instanceof PrismaClientKnownRequestError &&
         err.code === 'P2025'
       ) {
         return false;

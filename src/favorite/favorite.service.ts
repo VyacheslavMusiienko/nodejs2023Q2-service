@@ -3,16 +3,12 @@ import {
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
-import { v4 as uuidv4 } from 'uuid';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { PrismaService } from '../database/prisma/prisma.service';
 
 @Injectable()
 export class FavoriteService {
-  #favoritesId: string;
-  constructor(private readonly prismaService: PrismaService) {
-    this.#favoritesId = uuidv4();
-  }
+  constructor(private readonly prismaService: PrismaService) {}
 
   async findAll() {
     const [artists, albums, tracks] = await Promise.all([
@@ -37,7 +33,7 @@ export class FavoriteService {
       });
       return { message: 'Add track to the favorites' };
     } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+      if (err instanceof PrismaClientKnownRequestError) {
         if (err.code === 'P2003') {
           throw new UnprocessableEntityException(`Track with ${id} not found`);
         }
@@ -57,7 +53,7 @@ export class FavoriteService {
       return { message: 'Remove track from the favorites' };
     } catch (err) {
       if (
-        err instanceof Prisma.PrismaClientKnownRequestError &&
+        err instanceof PrismaClientKnownRequestError &&
         err.code === 'P2025'
       ) {
         throw new NotFoundException(`Track with ${id} not found`);
@@ -73,7 +69,7 @@ export class FavoriteService {
       });
       return { message: 'Add album to the favorites' };
     } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+      if (err instanceof PrismaClientKnownRequestError) {
         if (err.code === 'P2003') {
           throw new UnprocessableEntityException(`Album with ${id} not found`);
         }
@@ -93,7 +89,7 @@ export class FavoriteService {
       return { message: 'Remove album from the favorites' };
     } catch (err) {
       if (
-        err instanceof Prisma.PrismaClientKnownRequestError &&
+        err instanceof PrismaClientKnownRequestError &&
         err.code === 'P2025'
       ) {
         throw new NotFoundException(`Album with ${id} not found`);
@@ -109,7 +105,7 @@ export class FavoriteService {
       });
       return { message: 'Add artist to the favorites' };
     } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+      if (err instanceof PrismaClientKnownRequestError) {
         if (err.code === 'P2003') {
           throw new UnprocessableEntityException(`Artist with ${id} not found`);
         }
@@ -129,7 +125,7 @@ export class FavoriteService {
       return { message: 'Remove artist from the favorites' };
     } catch (err) {
       if (
-        err instanceof Prisma.PrismaClientKnownRequestError &&
+        err instanceof PrismaClientKnownRequestError &&
         err.code === 'P2025'
       ) {
         throw new NotFoundException(`Artist with ${id} not found`);

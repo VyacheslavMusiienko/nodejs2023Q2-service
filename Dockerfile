@@ -1,7 +1,7 @@
-FROM node:18.16-alpine
-WORKDIR /usr/app
-COPY package*.json .
-RUN npm ci && npm cache clean --force
+FROM node:18-alpine
+WORKDIR /app
+COPY ["package.json", "package-lock.json*", "./"]
+COPY prisma ./prisma
 COPY . .
-ENTRYPOINT ["./entrypoint.sh"]
-CMD [ "npm", "run", "start:dev" ]
+RUN npm ci && npx prisma generate && npm cache clean --force
+CMD ["npm", "run", "start:dev"]

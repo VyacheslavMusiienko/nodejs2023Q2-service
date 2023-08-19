@@ -15,7 +15,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
 
   const yamlData = await readFile(
-    join(process.cwd(), './doc/api.yaml'),
+    join(process.cwd(), './src/doc/api.yaml'),
     'utf-8',
   );
   const document = yaml.load(yamlData) as OpenAPIObject | (() => OpenAPIObject);

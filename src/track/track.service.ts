@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { plainToClass } from 'class-transformer';
 import { PrismaService } from '../database/prisma/prisma.service';
 import { CreateTrackDto } from './dto/create.dto';
@@ -62,7 +62,7 @@ export class TrackService {
       return plainToClass(Track, updatedTrack);
     } catch (error) {
       if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error instanceof PrismaClientKnownRequestError &&
         error.code === 'P2025'
       ) {
         return null;
@@ -79,7 +79,7 @@ export class TrackService {
       return true;
     } catch (err) {
       if (
-        err instanceof Prisma.PrismaClientKnownRequestError &&
+        err instanceof PrismaClientKnownRequestError &&
         err.code === 'P2025'
       ) {
         return false;
