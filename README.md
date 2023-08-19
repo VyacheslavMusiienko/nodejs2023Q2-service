@@ -44,6 +44,19 @@ docker-compose up
 
 After docker compose command complete and dockers starting you can open in your browser OpenAPI documentation by typing http://localhost:4000/doc/ (port 4000 as default) and execute test queries.
 
+## Scan Vulnerabilities
+After build images by command 'docker-compose up'
+
+ Run scan image with application
+  ```
+  npm run docker:scan:app
+  ```
+
+   Run scan image with PostgresQL
+  ```
+  npm run docker:scan:db
+  ```
+
 After application running open new terminal and enter:
 
 ```
