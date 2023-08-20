@@ -24,7 +24,8 @@
     "prisma:migrate": "prisma migrate deploy",
     "prisma:migrate:dev": "prisma migrate dev",
     "docker:scan:db": "docker scout cves nodejs2023q2-service-postgres",
-    "docker:scan:app": "docker scout cves nodejs2023q2-service-app"
+    "docker:scan:app": "docker scout cves nodejs2023q2-service-app",
+    "docker:clean": "docker-compose down && docker system prune -af && docker volume rm data logs"
   },
   "jest": {
     "moduleFileExtensions": [

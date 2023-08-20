@@ -24,13 +24,17 @@ services:
     volumes:
       - ./pgdata:/var/lib/postgresql/data
       - ./pglogs:/logs
+    # healthcheck:
+    #   test: ['CMD', 'pg_isready', '-U', 'postgres', '-p', $POSTGRES_PORT]
+    #   interval: 5s
+    #   timeout: 3s
+    #   retries: 10
   app:
     container_name: app
     restart: always
     build: ./
     volumes:
       - .:/app/src
-      - node-modules:/usr/app/node_modules
     ports:
       - ${PORT}:${PORT}
     depends_on:
