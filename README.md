@@ -60,7 +60,7 @@ After build images by command 'docker-compose up'
 After application running open new terminal and enter:
 
 ```
-npm run test
+npm run test:auth
 ```
 
 After starting the app on port (4000 as default) you can open

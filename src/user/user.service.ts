@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { plainToClass } from 'class-transformer';
 import { v4 as uuidv4 } from 'uuid';
@@ -51,6 +55,10 @@ export class UserService {
     const user = await this.prismaService.user.findUnique({
       where: { id: id },
     });
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
 
     const isPasswordsEqual = await compareData(oldPassword, user.password);
 

@@ -1,9 +1,6 @@
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
-import { OpenAPIObject, SwaggerModule } from '@nestjs/swagger';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import 'dotenv/config';
-import { readFile } from 'fs/promises';
-import * as yaml from 'js-yaml';
-import { join } from 'path';
 import { AppModule } from './app.module';
 import { LogLevels } from './logger/enum/logger.enum';
 import { LoggingService } from './logger/logger.service';
@@ -16,12 +13,22 @@ const LOGGER_LEVEL = [Object.values(LogLevels)[LOG_LEVEL]];
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
 
-  const yamlData = await readFile(
-    join(process.cwd(), './src/doc/api.yaml'),
-    'utf-8',
-  );
-  const document = yaml.load(yamlData) as OpenAPIObject | (() => OpenAPIObject);
-  SwaggerModule.setup('doc', app, document);
+  const config = new DocumentBuilder()
+    .setTitle('Home-Library')
+    .setDescription('REST API')
+    .setVersion('0.0.1')
+    .addBearerAuth(
+      {
+        type: 'apiKey',
+        name: 'Authorization',
+        in: 'header',
+        bearerFormat: 'JWT',
+      },
+      'Bearer',
+    )
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('/doc', app, document);
 
   const logger = app.get(LoggingService);
   app.useLogger(logger);
