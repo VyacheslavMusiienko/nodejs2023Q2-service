@@ -1,4 +1,5 @@
 import {
+  ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
@@ -7,17 +8,15 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
-  UseFilters,
   UseInterceptors,
 } from '@nestjs/common';
 import { StatusCodes } from 'http-status-codes';
-import { HttpExceptionFilter } from '../utils/httpFilter';
-import { TransformInterceptor } from '../utils/httpTransform';
 import { FavoriteService } from './favorite.service';
+import { Auth } from '../utils/decorator/auth.decorator';
 
 @Controller('favs')
-@UseFilters(new HttpExceptionFilter())
-@UseInterceptors(new TransformInterceptor())
+@UseInterceptors(ClassSerializerInterceptor)
+@Auth()
 export class FavoriteController {
   constructor(private readonly favoriteService: FavoriteService) {}
 

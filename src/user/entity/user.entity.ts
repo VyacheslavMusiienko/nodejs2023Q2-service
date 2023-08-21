@@ -3,6 +3,7 @@ import { Exclude, Transform } from 'class-transformer';
 export class User {
   readonly id: string;
   readonly login: string;
+  readonly refreshToken: string;
 
   @Exclude()
   readonly password: string;

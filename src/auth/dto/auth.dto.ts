@@ -1,11 +1,3 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { CreateUserDto } from '../../user/dto/create.dto';
 
-export class AuthUserDto {
-  @IsString()
-  @IsNotEmpty()
-  login: string;
-
-  @IsString()
-  @IsNotEmpty()
-  password: string;
-}
+export class AuthUserDto extends CreateUserDto {}

@@ -1,5 +1,6 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
@@ -10,19 +11,18 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
-  UseFilters,
   UseInterceptors,
+  ValidationPipe,
 } from '@nestjs/common';
 import { StatusCodes } from 'http-status-codes';
-import { HttpExceptionFilter } from '../utils/httpFilter';
-import { TransformInterceptor } from '../utils/httpTransform';
+import { Auth } from '../utils/decorator/auth.decorator';
 import { AlbumService } from './album.service';
 import { CreateAlbumDto } from './dto/create.dto';
 import { UpdateAlbumDto } from './dto/update.dto';
 
 @Controller('album')
-@UseFilters(new HttpExceptionFilter())
-@UseInterceptors(new TransformInterceptor())
+@UseInterceptors(ClassSerializerInterceptor)
+@Auth()
 export class AlbumController {
   constructor(private readonly albumService: AlbumService) {}
 
@@ -46,7 +46,10 @@ export class AlbumController {
 
   @Post()
   @Header('Content-Type', 'application/json')
-  async create(@Body() createAlbum: CreateAlbumDto) {
+  async create(
+    @Body(new ValidationPipe({ validateCustomDecorators: true }))
+    createAlbum: CreateAlbumDto,
+  ) {
     return await this.albumService.create(createAlbum);
   }
 
@@ -54,7 +57,8 @@ export class AlbumController {
   @Header('Content-Type', 'application/json')
   async update(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateAlbum: UpdateAlbumDto,
+    @Body(new ValidationPipe({ validateCustomDecorators: true }))
+    updateAlbum: UpdateAlbumDto,
   ) {
     const updatedAlbum = await this.albumService.update(id, updateAlbum);
 

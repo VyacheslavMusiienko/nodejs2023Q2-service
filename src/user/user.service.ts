@@ -1,12 +1,9 @@
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { plainToClass } from 'class-transformer';
 import { v4 as uuidv4 } from 'uuid';
 import { PrismaService } from '../database/prisma/prisma.service';
+import { compareData, hashData } from '../utils/bcript';
 import { CreateUserDto } from './dto/create.dto';
 import { UpdatePasswordDto } from './dto/update.dto';
 import { User } from './entity/user.entity';
@@ -37,7 +34,7 @@ export class UserService {
     const newUser = new User({
       id: uuidv4(),
       login,
-      password: password,
+      password: await hashData(password),
       version: 1,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -55,9 +52,9 @@ export class UserService {
       where: { id: id },
     });
 
-    if (!user) throw new NotFoundException(`User was not found`);
+    const isPasswordsEqual = await compareData(oldPassword, user.password);
 
-    if (user.password === oldPassword) {
+    if (isPasswordsEqual) {
       await this.prismaService.user.update({
         where: { id: id },
         data: {

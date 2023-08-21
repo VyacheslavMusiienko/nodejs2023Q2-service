@@ -1,5 +1,6 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
@@ -10,19 +11,18 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
-  UseFilters,
   UseInterceptors,
+  ValidationPipe,
 } from '@nestjs/common';
 import { StatusCodes } from 'http-status-codes';
-import { HttpExceptionFilter } from '../utils/httpFilter';
-import { TransformInterceptor } from '../utils/httpTransform';
 import { CreateTrackDto } from './dto/create.dto';
 import { UpdateTrackDto } from './dto/update.dto';
 import { TrackService } from './track.service';
+import { Auth } from '../utils/decorator/auth.decorator';
 
 @Controller('track')
-@UseFilters(new HttpExceptionFilter())
-@UseInterceptors(new TransformInterceptor())
+@UseInterceptors(ClassSerializerInterceptor)
+@Auth()
 export class TrackController {
   constructor(private readonly trackService: TrackService) {}
 
@@ -45,7 +45,10 @@ export class TrackController {
 
   @Post()
   @Header('Content-Type', 'application/json')
-  async create(@Body() createTrack: CreateTrackDto) {
+  async create(
+    @Body(new ValidationPipe({ validateCustomDecorators: true }))
+    createTrack: CreateTrackDto,
+  ) {
     return await this.trackService.create(createTrack);
   }
 
@@ -53,7 +56,8 @@ export class TrackController {
   @Header('Content-Type', 'application/json')
   async update(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateTrack: UpdateTrackDto,
+    @Body(new ValidationPipe({ validateCustomDecorators: true }))
+    updateTrack: UpdateTrackDto,
   ) {
     const updatedTrack = await this.trackService.update(id, updateTrack);
 

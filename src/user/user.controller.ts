@@ -1,5 +1,6 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
@@ -10,19 +11,18 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
-  UseFilters,
   UseInterceptors,
+  ValidationPipe,
 } from '@nestjs/common';
 import { StatusCodes } from 'http-status-codes';
-import { HttpExceptionFilter } from '../utils/httpFilter';
-import { TransformInterceptor } from '../utils/httpTransform';
 import { CreateUserDto } from './dto/create.dto';
 import { UpdatePasswordDto } from './dto/update.dto';
 import { UserService } from './user.service';
+import { Auth } from '../utils/decorator/auth.decorator';
 
 @Controller('user')
-@UseFilters(new HttpExceptionFilter())
-@UseInterceptors(new TransformInterceptor())
+@UseInterceptors(ClassSerializerInterceptor)
+@Auth()
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -46,7 +46,10 @@ export class UserController {
 
   @Header('Content-Type', 'application/json')
   @Post()
-  async create(@Body() createUser: CreateUserDto) {
+  async create(
+    @Body(new ValidationPipe({ validateCustomDecorators: true }))
+    createUser: CreateUserDto,
+  ) {
     return await this.userService.create(createUser);
   }
 
@@ -54,7 +57,8 @@ export class UserController {
   @Put(':id')
   async update(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() updatePassword: UpdatePasswordDto,
+    @Body(new ValidationPipe({ validateCustomDecorators: true }))
+    updatePassword: UpdatePasswordDto,
   ) {
     return await this.userService.update(id, updatePassword);
   }

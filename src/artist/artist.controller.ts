@@ -1,5 +1,6 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
@@ -10,19 +11,18 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
-  UseFilters,
   UseInterceptors,
+  ValidationPipe,
 } from '@nestjs/common';
 import { StatusCodes } from 'http-status-codes';
-import { HttpExceptionFilter } from '../utils/httpFilter';
-import { TransformInterceptor } from '../utils/httpTransform';
+import { Auth } from '../utils/decorator/auth.decorator';
 import { ArtistService } from './artist.service';
 import { CreateArtistDto } from './dto/create.dto';
 import { UpdateArtistDto } from './dto/updata.dto';
 
 @Controller('artist')
-@UseFilters(new HttpExceptionFilter())
-@UseInterceptors(new TransformInterceptor())
+@UseInterceptors(ClassSerializerInterceptor)
+@Auth()
 export class ArtistController {
   constructor(private readonly artistService: ArtistService) {}
 
@@ -46,7 +46,10 @@ export class ArtistController {
 
   @Post()
   @Header('Content-Type', 'application/json')
-  async create(@Body() createArtist: CreateArtistDto) {
+  async create(
+    @Body(new ValidationPipe({ validateCustomDecorators: true }))
+    createArtist: CreateArtistDto,
+  ) {
     return await this.artistService.create(createArtist);
   }
 
@@ -54,7 +57,8 @@ export class ArtistController {
   @Header('Content-Type', 'application/json')
   async update(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateArtist: UpdateArtistDto,
+    @Body(new ValidationPipe({ validateCustomDecorators: true }))
+    updateArtist: UpdateArtistDto,
   ) {
     const updatedArtist = await this.artistService.update(id, updateArtist);
 
